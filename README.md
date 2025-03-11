@@ -136,6 +136,20 @@ Use these credentials to test the app:
 - [Material 3 Design Guidelines](https://m3.material.io/)
 - [FakeStore API Documentation](https://fakestoreapi.com/docs)
 
-## License
+## Contributing
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Contributions are welcome! Here's how you can help:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+Please make sure to update tests as appropriate and follow the existing code style.
+
+## Contact
+
+For questions or suggestions, reach out at:
+- **Email**: kartikkattishettar@gmail.com
+- **GitHub**: [Kartik](https://github.com/kartik17k)
