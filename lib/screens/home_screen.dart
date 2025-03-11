@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isSmallScreen = screenSize.width < 600;
     final isMediumScreen = screenSize.width >= 600 && screenSize.width < 1200;
     final crossAxisCount = isSmallScreen ? 2 : (isMediumScreen ? 3 : 4);
-    final childAspectRatio = isSmallScreen ? 0.75 : (isMediumScreen ? 0.8 : 0.85);
+    final childAspectRatio = isSmallScreen ? 0.65 : (isMediumScreen ? 0.7 : 0.75);
 
     return Scaffold(
       appBar: AppBar(
@@ -230,20 +230,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                     borderRadius: BorderRadius.vertical(
                                       top: Radius.circular(AppTheme.borderRadius),
                                     ),
-                                    child: Image.network(
-                                      product['image'],
-                                      fit: BoxFit.contain,
-                                      loadingBuilder: (context, child, loadingProgress) {
-                                        if (loadingProgress == null) return child;
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            value: loadingProgress.expectedTotalBytes != null
-                                                ? loadingProgress.cumulativeBytesLoaded /
-                                                    loadingProgress.expectedTotalBytes!
-                                                : null,
-                                          ),
-                                        );
-                                      },
+                                    child: Container(
+                                      padding: EdgeInsets.all(AppTheme.padding),
+                                      child: Center(
+                                        child: Image.network(
+                                          product['image'],
+                                          fit: BoxFit.contain,
+                                          loadingBuilder: (context, child, loadingProgress) {
+                                            if (loadingProgress == null) return child;
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress.expectedTotalBytes != null
+                                                    ? loadingProgress.cumulativeBytesLoaded /
+                                                        loadingProgress.expectedTotalBytes!
+                                                    : null,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -251,9 +256,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               Expanded(
                                 flex: 2,
                                 child: Padding(
-                                  padding: EdgeInsets.all(AppTheme.padding ),
+                                  padding: EdgeInsets.all(AppTheme.padding),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         product['title'],
@@ -261,11 +267,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         overflow: TextOverflow.ellipsis,
                                         style: AppTheme.titleSmall,
                                       ),
-                                      SizedBox(height: 25.0,),
                                       Text(
                                         '\$${product['price'].toStringAsFixed(2)}',
-                                        style: AppTheme.titleMedium.copyWith(
+                                        style: AppTheme.titleLarge.copyWith(
                                           color: AppTheme.primaryColor,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ],
