@@ -1,19 +1,31 @@
+// Import required packages and libraries
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import 'login_screen.dart';
 
+/// ProfileScreen Widget
+///
+/// Displays user profile information and provides access to various settings
+/// including notifications, privacy, and help & support.
+/// Features a responsive layout for different screen sizes and a logout function.
 class ProfileScreen extends StatefulWidget {
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
+/// State class for ProfileScreen
+///
+/// Manages user profile data, preferences, and the UI for various settings panels.
 class _ProfileScreenState extends State<ProfileScreen> {
+  // User information fields
   String _username = '';
   String _email = '';
   bool _isLoading = true;
   bool _notificationsEnabled = true;
   String _selectedPrivacy = 'Public';
+  
+  // Notification preferences with default values
   Map<String, bool> _notificationSettings = {
     'Order Updates': true,
     'Promotions': false,
@@ -21,6 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'Price Drops': true,
   };
 
+  // Privacy setting options with default values
   Map<String, String> _privacySettings = {
     'Profile Visibility': 'Public',
     'Show Email': 'Friends Only',
@@ -28,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'Order History': 'Only Me',
   };
 
+  // Help and support topics for the help section
   List<Map<String, dynamic>> _helpTopics = [
     {
       'title': 'Frequently Asked Questions',
@@ -62,9 +76,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadUserData(); // Load user data when screen initializes
   }
 
+  /// Loads user data from SharedPreferences
+  ///
+  /// Retrieves username and email information from local storage
+  /// and updates the UI accordingly. Falls back to default values
+  /// if no saved data is found.
   Future<void> _loadUserData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -81,6 +100,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  /// Displays a modal bottom sheet with notification settings
+  ///
+  /// Allows users to toggle different notification types on/off
+  /// using a series of switches. Changes are saved when the user
+  /// taps the Save Changes button.
   void _showNotificationSettings() {
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 600;
@@ -105,6 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header with title and close button
               Row(
                 children: [
                   Text('Notification Settings', style: AppTheme.titleLarge),
@@ -117,6 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               Divider(),
               SizedBox(height: AppTheme.spacing),
+              // Generate toggle switches for each notification type
               ..._notificationSettings.entries.map(
                 (entry) => Container(
                   margin: EdgeInsets.only(bottom: AppTheme.spacing),
@@ -134,6 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               SizedBox(height: AppTheme.spacing),
+              // Save changes button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -150,6 +177,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /// Displays a modal bottom sheet with privacy settings
+  ///
+  /// Allows users to choose privacy levels for different aspects of their account
+  /// using dropdown menus. Options include Public, Friends Only, Only Me, and Everyone.
   void _showPrivacySettings() {
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 600;
@@ -174,6 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header with title and close button
               Row(
                 children: [
                   Text('Privacy Settings', style: AppTheme.titleLarge),
@@ -186,6 +218,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               Divider(),
               SizedBox(height: AppTheme.spacing),
+              // Generate list tiles with dropdown menus for each privacy setting
               ..._privacySettings.entries.map(
                 (entry) => Container(
                   margin: EdgeInsets.only(bottom: AppTheme.spacing),
@@ -215,6 +248,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               SizedBox(height: AppTheme.spacing),
+              // Save changes button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -231,6 +265,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /// Displays a modal sheet with help and support information
+  ///
+  /// Features expandable panels for each help topic, with clickable
+  /// items within each panel. Uses a draggable scrollable sheet for
+  /// flexibility in how much of the screen it occupies.
   void _showHelpSupport() {
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 600;
@@ -258,6 +297,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header with title and close button
               Row(
                 children: [
                   Text('Help & Support', style: AppTheme.titleLarge),
@@ -270,6 +310,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               Divider(),
               SizedBox(height: AppTheme.spacing),
+              // Expandable list of help topics
               Expanded(
                 child: ListView.separated(
                   controller: scrollController,
@@ -334,6 +375,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /// Handles the logout process
+  ///
+  /// Shows a confirmation dialog before logging out.
+  /// When confirmed, clears all SharedPreferences data and
+  /// returns the user to the login screen.
   Future<void> _logout() async {
     showDialog(
       context: context,
@@ -352,8 +398,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             onPressed: () async {
               try {
+                // Clear all stored preferences (user session data)
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.clear();
+                // Navigate back to login screen, removing all previous routes
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -377,6 +425,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate responsive layout parameters based on screen size
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 600;
     final isMediumScreen = screenSize.width >= 600 && screenSize.width < 1200;
@@ -398,6 +447,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     children: [
                       SizedBox(height: AppTheme.spacing * 2),
+                      // User avatar - displays the first letter of username
                       CircleAvatar(
                         radius: isSmallScreen ? 50 : 70,
                         backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
@@ -410,6 +460,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       SizedBox(height: AppTheme.spacing * 2),
+                      // Account information card
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(AppTheme.padding),
@@ -437,6 +488,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       SizedBox(height: AppTheme.spacing * 2),
+                      // Settings card with various options
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(AppTheme.padding),
@@ -468,6 +520,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       SizedBox(height: AppTheme.spacing * 2),
+                      // Logout button
                       Container(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -492,6 +545,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /// Helper method to build consistent info rows
+  ///
+  /// Creates a row with an icon, label, and value for displaying
+  /// user information in a consistent format.
   Widget _buildInfoRow({
     required IconData icon,
     required String label,
@@ -499,6 +556,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     return Row(
       children: [
+        // Icon container with styled background
         Container(
           padding: EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -512,6 +570,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         SizedBox(width: AppTheme.spacing),
+        // Label and value in a column
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -533,6 +592,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /// Helper method to build consistent setting tiles
+  ///
+  /// Creates a ListTile with an icon, title, and chevron for
+  /// navigation to different settings screens.
   Widget _buildSettingTile({
     required IconData icon,
     required String title,

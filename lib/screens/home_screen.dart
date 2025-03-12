@@ -1,3 +1,4 @@
+// Import required packages and libraries
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -7,27 +8,51 @@ import 'cart_screen.dart';
 import 'product_details_screen.dart';
 import 'profile_screen.dart';
 
+/// HomeScreen Widget
+///
+/// Main product browsing interface of the StyleHub e-commerce application.
+/// Features include:
+/// - Product listing in a responsive grid layout
+/// - Category filtering
+/// - Search functionality
+/// - Navigation to cart, product details, and user profile
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+/// State class for HomeScreen
+///
+/// Manages the state of the home screen including product data fetching,
+/// filtering, searching, and UI rendering based on screen size.
 class _HomeScreenState extends State<HomeScreen> {
+  // List of available product categories
   final List<String> categories = ['All', 'Electronics', 'Jewelery', "Men's Clothing", "Women's Clothing"];
+  // Currently selected category for filtering
   String selectedCategory = 'All';
+  // All products fetched from API
   List<dynamic> products = [];
+  // Products after applying category and search filters
   List<dynamic> filteredProducts = [];
+  // Loading state indicator
   bool isLoading = true;
+  // Current search query text
   String searchQuery = '';
+  // Number of items in the user's cart
   int _cartItems = 0;
 
   @override
   void initState() {
     super.initState();
+    // Fetch products and cart data when screen initializes
     _fetchProducts();
     _fetchCartItems();
   }
 
+  /// Fetches product data from the Fake Store API
+  ///
+  /// Retrieves all products and updates the state with the fetched data.
+  /// Sets loading state to false when complete or on error.
   Future<void> _fetchProducts() async {
     try {
       final response = await http.get(Uri.parse('https://fakestoreapi.com/products'));
@@ -45,6 +70,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Fetches the current user's cart items from the API
+  ///
+  /// Retrieves cart data for a specific user and calculates the total
+  /// number of items in the cart for badge display.
   Future<void> _fetchCartItems() async {
     try {
       final userId = 1; // Replace with actual user ID
@@ -63,11 +92,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Filters products based on selected category and search query
+  ///
+  /// Updates the filteredProducts list by applying the current category filter
+  /// and search text filter to the full products list.
   void _filterProducts() {
     setState(() {
       filteredProducts = products.where((product) {
+        // Check if product matches selected category or 'All' is selected
         final matchesCategory = selectedCategory == 'All' || 
             product['category'].toString().toLowerCase() == selectedCategory.toLowerCase();
+        // Check if product title contains the search query text
         final matchesSearch = searchQuery.isEmpty || 
             product['title'].toString().toLowerCase().contains(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
@@ -77,10 +112,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate responsive layout parameters based on screen size
     final screenSize = MediaQuery.of(context).size;
     final padding = MediaQuery.of(context).padding;
     final isSmallScreen = screenSize.width < 600;
     final isMediumScreen = screenSize.width >= 600 && screenSize.width < 1200;
+    // Determine grid columns and aspect ratio based on screen size
     final crossAxisCount = isSmallScreen ? 2 : (isMediumScreen ? 3 : 4);
     final childAspectRatio = isSmallScreen ? 0.65 : (isMediumScreen ? 0.7 : 0.75);
 
@@ -88,10 +125,12 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: AppLogo(),
         actions: [
+          // Cart button with item count badge
           IconButton(
             icon: Stack(
               children: [
                 Icon(Icons.shopping_cart),
+                // Show badge with item count if cart is not empty
                 if (_cartItems > 0)
                   Positioned(
                     right: 0,
@@ -120,8 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CartScreen()),
-            ).then((_) => _fetchCartItems()),
+            ).then((_) => _fetchCartItems()), // Refresh cart count when returning
           ),
+          // Profile button
           IconButton(
             icon: Icon(Icons.person),
             onPressed: () => Navigator.push(
@@ -134,11 +174,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            // Search and filter section
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(AppTheme.padding),
                 child: Column(
                   children: [
+                    // Search text field
                     TextField(
                       decoration: AppTheme.inputDecoration.copyWith(
                         hintText: 'Search products...',
@@ -152,6 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     SizedBox(height: AppTheme.spacing),
+                    // Horizontal scrolling category filter chips
                     SizedBox(
                       height: 40,
                       child: ListView.builder(
@@ -180,11 +223,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            // Conditional content based on loading state and filter results
             if (isLoading)
+              // Show loading indicator when fetching products
               SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator()),
               )
             else if (filteredProducts.isEmpty)
+              // Show message when no products match filters
               SliverFillRemaining(
                 child: Center(
                   child: Text(
@@ -194,6 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               )
             else
+              // Product grid display
               SliverPadding(
                 padding: EdgeInsets.all(AppTheme.padding),
                 sliver: SliverGrid(
@@ -206,18 +253,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final product = filteredProducts[index];
+                      // Product card with tap navigation
                       return GestureDetector(
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => ProductDetailsScreen(product: product),
                           ),
-                        ).then((_) => _fetchCartItems()),
+                        ).then((_) => _fetchCartItems()), // Refresh cart count when returning
                         child: Container(
                           decoration: AppTheme.cardDecoration,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Product image section (top 60% of card)
                               Expanded(
                                 flex: 3,
                                 child: Container(
@@ -253,6 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
+                              // Product details section (bottom 40% of card)
                               Expanded(
                                 flex: 2,
                                 child: Padding(
@@ -261,12 +311,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
+                                      // Product title with ellipsis for overflow
                                       Text(
                                         product['title'],
-                                        maxLines: 2,
+                                        maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: AppTheme.titleSmall,
                                       ),
+                                      // Product price with accent color
                                       Text(
                                         '\$${product['price'].toStringAsFixed(2)}',
                                         style: AppTheme.titleLarge.copyWith(

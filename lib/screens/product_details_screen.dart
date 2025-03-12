@@ -1,9 +1,16 @@
+// Import required packages and libraries
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../config/theme.dart';
 
+/// ProductDetailsScreen Widget
+///
+/// Displays detailed information about a selected product and allows the user
+/// to add it to their cart. Features responsive layouts for different screen sizes.
+/// Receives product data as a parameter from the previous screen.
 class ProductDetailsScreen extends StatefulWidget {
+  /// Product data from API, passed from the product listing screen
   final Map<String, dynamic> product;
 
   ProductDetailsScreen({required this.product});
@@ -12,16 +19,26 @@ class ProductDetailsScreen extends StatefulWidget {
   _ProductDetailsScreenState createState() => _ProductDetailsScreenState();
 }
 
+/// State class for ProductDetailsScreen
+///
+/// Manages the state of the product details screen, including the cart
+/// addition process and rendering different layouts based on screen size.
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  // Tracks the loading state when adding product to cart
   bool _isAddingToCart = false;
 
+  /// Adds the current product to the user's cart
+  ///
+  /// Makes an API request to add the product to the cart and displays
+  /// appropriate feedback to the user based on the result.
   Future<void> _addToCart() async {
     setState(() {
-      _isAddingToCart = true;
+      _isAddingToCart = true; // Show loading indicator
     });
 
     try {
       final userId = 1; // Replace with actual user ID
+      // Prepare cart data for API request
       final cart = {
         'userId': userId,
         'date': DateTime.now().toIso8601String(),
@@ -30,6 +47,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ]
       };
 
+      // Send POST request to add item to cart
       final response = await http.post(
         Uri.parse('https://fakestoreapi.com/carts'),
         headers: {'Content-Type': 'application/json'},
@@ -37,6 +55,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       );
 
       if (response.statusCode == 200) {
+        // Show success message and navigate back
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Added to cart successfully'),
@@ -48,6 +67,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         throw Exception('Failed to add to cart');
       }
     } catch (e) {
+      // Show error message if request fails
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error adding to cart: $e'),
@@ -55,6 +75,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ),
       );
     } finally {
+      // Reset loading state whether successful or not
       setState(() {
         _isAddingToCart = false;
       });
@@ -63,6 +84,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate responsive layout parameters based on screen size
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 600;
     final isMediumScreen = screenSize.width >= 600 && screenSize.width < 1200;
@@ -71,17 +93,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       appBar: AppBar(
         title: Text('Product Details'),
       ),
+      // Choose layout based on screen size
       body: isSmallScreen
           ? _buildMobileLayout()
           : _buildDesktopLayout(),
     );
   }
 
+  /// Builds the mobile layout for smaller screens
+  ///
+  /// Creates a vertically scrolling layout with the product image at the top
+  /// followed by product details and the add to cart button.
   Widget _buildMobileLayout() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Product image section - full width and square aspect ratio
           AspectRatio(
             aspectRatio: 1,
             child: Container(
@@ -98,16 +126,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
             ),
           ),
+          // Product details section
           Padding(
             padding: EdgeInsets.all(AppTheme.padding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Product title
                 Text(
                   widget.product['title'],
                   style: AppTheme.titleLarge,
                 ),
                 SizedBox(height: AppTheme.spacing),
+                // Product category badge
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: AppTheme.padding / 2,
@@ -125,6 +156,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: AppTheme.spacing),
+                // Product price
                 Text(
                   '\$${widget.product['price'].toStringAsFixed(2)}',
                   style: AppTheme.titleLarge.copyWith(
@@ -132,11 +164,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: AppTheme.spacing),
+                // Product description
                 Text(
                   widget.product['description'],
                   style: AppTheme.bodyMedium,
                 ),
                 SizedBox(height: AppTheme.spacing * 2),
+                // Add to cart button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -162,10 +196,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
+  /// Builds the desktop/tablet layout for larger screens
+  ///
+  /// Creates a two-column layout with the product image on the left
+  /// and product details with add to cart button on the right.
   Widget _buildDesktopLayout() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Left column - Product image
         Expanded(
           flex: 1,
           child: Container(
@@ -180,6 +219,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
           ),
         ),
+        // Right column - Product details
         Expanded(
           flex: 1,
           child: SingleChildScrollView(
@@ -187,11 +227,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Product title
                 Text(
                   widget.product['title'],
                   style: AppTheme.titleLarge,
                 ),
                 SizedBox(height: AppTheme.spacing * 1.5),
+                // Product category badge
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: AppTheme.padding / 2,
@@ -209,6 +251,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: AppTheme.spacing * 1.5),
+                // Product price
                 Text(
                   '\$${widget.product['price'].toStringAsFixed(2)}',
                   style: AppTheme.titleLarge.copyWith(
@@ -216,11 +259,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: AppTheme.spacing * 1.5),
+                // Product description
                 Text(
                   widget.product['description'],
                   style: AppTheme.bodyLarge,
                 ),
                 SizedBox(height: AppTheme.spacing * 3),
+                // Add to cart button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
