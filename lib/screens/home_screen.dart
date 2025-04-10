@@ -1,4 +1,5 @@
 // Import required packages and libraries
+import 'package:e_commerce/screens/add_product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -170,6 +171,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () => Navigator.push(context,MaterialPageRoute(builder: (context) => AddProductScreen()))
       ),
       body: SafeArea(
         child: CustomScrollView(
